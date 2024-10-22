@@ -18,6 +18,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 # Create your views here.
 print("hoiiiiiiiiiiiii")
+print("hello world")
 def index(request):
     if "email" in request.session:
         uid = User.objects.get(email = request.session["email"])

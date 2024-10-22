@@ -17,7 +17,7 @@ from .models import *
 from django.contrib import messages
 from django.core.paginator import Paginator
 # Create your views here.
-
+print("hoiiiiiiiiiiiii")
 def index(request):
     if "email" in request.session:
         uid = User.objects.get(email = request.session["email"])
@@ -463,6 +463,32 @@ def Related_products(request):
      
      else:
          return render(request,"login.html")
+     
+def apply_coupon(request):
+    if "email" in request.session:
+        uid = User.objects.get(email=request.session["email"])
+        cart_item = Add_to_cart.objects.filter(user_id=uid)
+        coupon = Coupon.objects.get(id = id)
+        if request.POST:
+            coupon = request.POST['code']
+            
+        subtotal = 0
+        Shipping_charge = 200
+        total = 0
+        discount = 0
+        for i in cart_item:
+            subtotal += i.total_price
+            
+            total = subtotal + Shipping_charge  
+
+
+        coupon = Coupon.objects.get(id = id)
+        
+       
+
+        
+        
+    return redirect("apply_coupne")     
 
     
 

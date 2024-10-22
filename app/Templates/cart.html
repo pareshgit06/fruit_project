@@ -121,20 +121,26 @@
                       
                         <div class="d-flex justify-content-between mb-4">
                             <h5 class="mb-0 me-4">Subtotal:</h5>
-                            <p class="mb-0">&#8377;{{subtotal}}</p>
+                            <p class="mb-0">&#8377; {{subtotal}}</p>
                         </div>
                        
                         <div class="d-flex justify-content-between">
                             <h5 class="mb-0 me-4">Shipping</h5>
                             <div class="">
-                                <p class="mb-0">Flat rate:&#8377;{{Shipping_charge}}</p>
+                                <p class="mb-0">&#8377; {{Shipping_charge}}</p>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between" style="margin-top: 20px;">
+                            <h5 class="mb-0 me-4" >Discount </h5>
+                            <div class="">
+                                <p class="mb-0">&#8377; 500</p>
                             </div>
                         </div>
                         <!-- <p class="mb-0 text-end">Shipping to Ukraine.</p> -->
                     </div>
                     <div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
                         <h5 class="mb-0 ps-4 me-4">Total</h5>
-                        <p class="mb-0 pe-4">&#8377;{{total}}</p>
+                        <p class="mb-0 pe-4"  style="font-weight:900;">&#8377; {{total}}</p>
                     </div>
                     <button class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4"
                         type="button">Proceed Checkout</button>

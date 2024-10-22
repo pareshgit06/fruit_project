@@ -1,4 +1,4 @@
-FreshFruit E-Commerce Platform
+FreshFruit E-Commerce Platform Project
 
 Project Summary: FreshFruit is a Django-based e-commerce platform designed for selling a variety of fresh fruits online. The project implements key e-commerce functionalities, including product display, user registration, login, shopping cart management, and payment integration.
 

@@ -12,4 +12,8 @@ User Registration and Login: Secure user registration and authentication system 
 
 CRUD Operations: Full CRUD functionality for product management (adding, updating, and deleting fruit listings). 
 
-Form Validation: Both GET and POST methods are used with proper validation for user inputs. Payment Integration: Seamless payment gateway integration for secure online transactions.
+Form Validation: Both GET and POST methods are used with proper validation for user inputs.
+
+Payment Integration: Seamless payment gateway integration for secure online transactions.
+
+Theme Implementation: A visually appealing theme has been implemented for a better user experience. This project showcases my understanding of Django fundamentals, including theme implementation, form handling, CRUD operations, and e-commerce workflows.

@@ -8,7 +8,6 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('error/', views.error, name='error'),
     path('cart/', views.cart, name='cart'),
-    path('show_cart', views.show_cart, name='show_cart'),
     path('add_to_cart/<int:id>/', views.add_to_cart, name='add_to_cart'),
     path('add_to_cart_remove/<int:id>/', views.add_to_cart_remove, name='add_to_cart_remove'),
     path('increment/<int:id>/', views.increment, name='increment'),
@@ -29,7 +28,9 @@ urlpatterns = [
     path('testimonial/', views.testimonial, name='testimonial'),
     path('Price_filter', views.Price_filter, name='Price_filter'),
     path('Search_filter', views.Search_filter, name='Search_filter'),
-    path('Related_products', views.Related_products, name='Related_products')
+    path('Related_products', views.Related_products, name='Related_products'),
+    path('apply_coupon', views.apply_coupon, name='apply_coupon')
+
 
 
 

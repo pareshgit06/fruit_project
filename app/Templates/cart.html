@@ -34,16 +34,23 @@
 </div>
 <!-- Single Page Header End -->
 
-   
+
 
 
 <!-- Cart Page Start -->
 
 <div class="container-fluid py-5">
-    {% if cart_item %}
-   
+    {% if  cart_item.count == 0 %}
+    <img style="display: block; margin: 50px auto;" src="{% static 'img/add_to_cart.png' %}" alt="">
+    <div style="text-align: center;">
+        <a href="{% url 'shop' %}" class="btn border border-secondary rounded-pill px-8 text-primary"
+            style="width: 200px; margin-left: 50px;">
+            <i class="me-0 text-primary"></i>Go To Shop
+        </a>
+    </div>
+    {% else %}
     <div class="container py-5">
-       
+
         <div class="table-responsive">
             <table class="table">
                 <thead>
@@ -76,16 +83,18 @@
                         <td>
                             <div class="input-group quantity mt-4" style="width: 100px;">
                                 <div class="input-group-btn">
-                                    <a href="{% url 'decrement' i.id %}"> <button class="btn btn-sm btn-minus rounded-circle bg-light border">
-                                        <i class="fa fa-minus"></i>
-                                    </button></a>
+                                    <a href="{% url 'decrement' i.id %}"> <button
+                                            class="btn btn-sm btn-minus rounded-circle bg-light border">
+                                            <i class="fa fa-minus"></i>
+                                        </button></a>
                                 </div>
                                 <input type="text" class="form-control form-control-sm text-center border-0"
                                     value="{{i.quantity}}">
                                 <div class="input-group-btn">
-                                    <a href="{% url 'increment' i.id %}"><button class="btn btn-sm btn-plus rounded-circle bg-light border">
-                                        <i class="fa fa-plus"></i>
-                                    </button></a>
+                                    <a href="{% url 'increment' i.id %}"><button
+                                            class="btn btn-sm btn-plus rounded-circle bg-light border">
+                                            <i class="fa fa-plus"></i>
+                                        </button></a>
                                 </div>
                             </div>
                         </td>
@@ -93,9 +102,10 @@
                             <p class="mb-0 mt-4">&#8377; {{i.total_price}} </p>
                         </td>
                         <td>
-                            <a href="{% url 'add_to_cart_remove' i.id %}"><button class="btn btn-md rounded-circle bg-light border mt-4">
-                              <i class="fa fa-times text-danger"></i>
-                            </button></a>
+                            <a href="{% url 'add_to_cart_remove' i.id %}"><button
+                                    class="btn btn-md rounded-circle bg-light border mt-4">
+                                    <i class="fa fa-times text-danger"></i>
+                                </button></a>
                         </td>
 
                     </tr>
@@ -105,25 +115,40 @@
                 </tbody>
             </table>
         </div>
+
         <div class="mt-5">
-            <input type="text" class="border-0 border-bottom rounded me-5 py-3 mb-4" placeholder="Coupon Code">
-            <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button">Apply Coupon</button>
+            <form method="POST" action="{% url 'apply_coupon' %}">
+                {% csrf_token %}
+                <input type="text" name="code" class="border-0 border-bottom rounded me-5 py-3 mb-4"
+                    placeholder="Coupon Code">
+                <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="submit">Apply
+                    Coupon</button>
+            </form>
+            {% if messages %}
+            {% for i in messages %}
+            <p style=></p>
+            <p style="font-size: 30px; color:red; margin-top: 50px;">{{i}}</p>
+            {% endfor %}
+            {% endif %}
+
         </div>
+
         <div class="row g-4 justify-content-end">
+           
             <div class="col-8"></div>
             <div class="col-sm-8 col-md-7 col-lg-6 col-xl-4">
-                
-                  
-            
+
+
+
                 <div class="bg-light rounded">
                     <div class="p-4">
                         <h1 class="display-6 mb-4">Cart <span class="fw-normal">Total</span></h1>
-                      
+
                         <div class="d-flex justify-content-between mb-4">
                             <h5 class="mb-0 me-4">Subtotal:</h5>
                             <p class="mb-0">&#8377; {{subtotal}}</p>
                         </div>
-                       
+
                         <div class="d-flex justify-content-between">
                             <h5 class="mb-0 me-4">Shipping</h5>
                             <div class="">
@@ -131,38 +156,26 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-between" style="margin-top: 20px;">
-                            <h5 class="mb-0 me-4" >Discount </h5>
+                            <h5 class="mb-0 me-4">Discount </h5>
                             <div class="">
-                                <p class="mb-0">&#8377; 500</p>
+                                <p class="mb-0">&#8377; {{discount}}</p>
                             </div>
                         </div>
                         <!-- <p class="mb-0 text-end">Shipping to Ukraine.</p> -->
                     </div>
                     <div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
-                        <h5 class="mb-0 ps-4 me-4">Total</h5>
-                        <p class="mb-0 pe-4"  style="font-weight:900;">&#8377; {{total}}</p>
+                        <h5 class="mb-0 ps-4 me-4">Total Price</h5>
+                        <p class="mb-0 pe-4" style="font-weight:900;">&#8377; {{total_price}}</p>
                     </div>
                     <button class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4"
                         type="button">Proceed Checkout</button>
                 </div>
-               
+
             </div>
         </div>
-       
+
     </div>
-    
-   
-    {% else %}
-    <img style="display: block; margin: 50px auto;" src="{% static 'img/add_to_cart.png' %}" alt="">
-    <div style="text-align: center;">
-        <a href="{% url 'shop' %}" 
-           class="btn border border-secondary rounded-pill px-8 text-primary" 
-           style="width: 200px; margin-left: 50px;">
-            <i class="me-0 text-primary"></i>Go To Shop
-        </a>
-    </div>
-    
- 
+
 </div>
 {% endif %}
 

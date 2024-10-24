@@ -78,8 +78,15 @@ class Add_to_Wishlist(models.Model):
     def __str__(self) -> str:
         return self.name 
     
+
+    
+
 class Coupon(models.Model):
-    discount = models.IntegerField()
-    code = models.CharField(max_length=50,null=True,blank=True) 
-    def __str__(self) -> str:
-            return self.code 
+    code=models.CharField(max_length=40,blank=True,null=True)
+    discount=models.IntegerField(default=0,blank=True,null=True)  
+    one_time_use=models.BooleanField(default=False)
+    expiry_date=models.DateTimeField(blank=True,null=True)
+
+    
+    def __str__(self):
+        return self.code

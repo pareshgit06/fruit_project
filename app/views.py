@@ -17,8 +17,6 @@ from .models import *
 from django.contrib import messages
 from django.core.paginator import Paginator
 # Create your views here.
-print("hoiiiiiiiiiiiii")
-print("hello world")
 
 def index(request):
     if "email" in request.session:
@@ -112,24 +110,59 @@ def shop(request):
         return render(request, "shop.html", con)
     else:
         return render(request, "login.html")
-
+      
 def cart(request):
     if "email" in request.session:
         uid = User.objects.get(email=request.session["email"])
         cart_item = Add_to_cart.objects.filter(user_id=uid)  # Saare cart items user ke liye le rahe hain
         # (yah usi user ko product show hogi jo login hai)
+
+        cart_item_count=Add_to_cart.objects.filter(user_id=uid).count()  # Count Cart Item
+        Wishlist_item_count=Add_to_Wishlist.objects.filter(user_id=uid).count()
+        
+        if cart_item.count()==0:
+            empty_cart="Your cart is empty." 
+            con = {
+                "uid":uid,
+                "empty_cart":empty_cart,
+               "cart_item_count":cart_item_count , 
+               "Wishlist_item_count":Wishlist_item_count
+            }
+        pid = Product.objects.filter(id__in=[item.product_id.id for item in cart_item ])
+
+        l1 = []
         subtotal = 0
         Shipping_charge = 200
-        total = 0
+        total_price = 0
+        discount = 0
+        if "discount" in request.session and cart_item.count()>=1:
+            discount=request.session['discount']
+        if "discount" in request.session and cart_item.count()==0:
+            del request.session['discount']   
+        if cart_item.count() >=1:
+            Shipping_charge=200
+        else:
+            discount=0
         for i in cart_item:
-            subtotal += i.total_price
-            total = subtotal + Shipping_charge             
+            a = i.quantity * i.price
+            l1.append(a)
+            subtotal = sum(l1)
+            total_price = subtotal + Shipping_charge - discount    
+
+              
         con = {
             "subtotal":subtotal,
             "Shipping_charge":Shipping_charge,
-            "total":total,
+            "total_price":total_price,
             "uid": uid,
-            "cart_item": cart_item
+            "pid":pid,
+            "cart_item": cart_item,
+            'discount':discount,
+            "Wishlist_item_count":Wishlist_item_count,
+             "cart_item_count":cart_item_count ,
+
+
+
         }
         return render(request, "cart.html", con)
     else:
@@ -235,15 +268,7 @@ def chackout(request):
     else:
         return render(request,'login.html')
 
-def show_cart(request):
-    if "email" in request.session:
-        uid = User.objects.get(email=request.session["email"]) 
-        cart_items = Add_to_cart.objects.filter(user_id=uid)
 
-        con={"uid":uid,"cart_items":cart_items}
-        return render(request,"cart.html",con)
-    else:
-        return render(request,'login.html')
 
 def contact(request):
     if "email" in request.session:
@@ -260,7 +285,6 @@ def contact(request):
         return render(request,'login.html')
 
 def register(request):
-    
     if request.method == "POST":
         name = request.POST['name']
         email = request.POST['email']
@@ -466,31 +490,139 @@ def Related_products(request):
      else:
          return render(request,"login.html")
      
+# def apply_coupon(request):
+#     if "email" in request.session:
+#         uid = User.objects.get(email=request.session["email"])
+#         cart_item = Add_to_cart.objects.filter(user_id=uid)
+
+#         discount = 0
+#         if request.method == "POST":
+#             coupon_code = request.POST.get('code')  # user enter code(coupon code)
+#             try:
+#                 # agar database ka coupe code valide hai to (apply descout)
+#                 coupon = Coupon.objects.get(code=coupon_code)
+#                 discount = coupon.discount
+#                 messages.success(request,"Your coupon is apply successfuly...")
+#             except Coupon.DoesNotExist:
+#                 # agar database ka coupon code valide nahi hai tab discout is 0
+#                 discount = 0
+#                 messages.error(request,"Coupon is Not apply...")
+
+#         # Calculate subtotal and total
+#         subtotal = 0
+#         Shipping_charge = 200
+#         for i in cart_item:
+#             subtotal += i.total_price
+
+#         total = subtotal + Shipping_charge - discount
+#         con = {
+#             "discount": discount,
+#             "total": total,
+#             "subtotal": subtotal,
+#             "Shipping_charge": Shipping_charge,
+#             "cart_item": cart_item, }
+
+#         return render(request, "cart.html", con)
+#     else:
+#         return render(request, "login.html")
+
+
+# def apply_coupon(request):
+#     if "email" in request.session:
+#         uid = User.objects.get(email = request.session["email"])
+#         cart_item = Add_to_cart.objects.get(user_id = uid)
+
+#         discaunt = 0
+#         if request.method == "POST":
+#             coupon_code = request.POST.get("code")
+#             try:
+#                 coupon = Coupon.objects.get(code = coupon_code)
+#                 discaunt = coupon.discount
+#             except Coupon.DoesNotExist:
+#                 discaunt = 0
+
+#         subtotal = 0
+#         Shipping_charge = 200
+#         for i in cart_item:
+#             subtotal += i.total_price
+#         totle = subtotal + Shipping_charge - discaunt
+
+#         con = {
+#             "discaunt":discaunt,
+#             "subtotal":subtotal,
+#             "Shipping_charge":Shipping_charge,
+#             "totle":totle,
+#             "cart_item":cart_item }
+
+#         return render(request,"cart.html",con)
+#     else:
+#         return render(request,'login.html')    
+
+
+
+    
+#===============
+from django.utils import timezone
 def apply_coupon(request):
     if "email" in request.session:
-        uid = User.objects.get(email=request.session["email"])
-        cart_item = Add_to_cart.objects.filter(user_id=uid)
-        coupon = Coupon.objects.get(id = id)
+        uid = User.objects.get(email=request.session['email'])
+        aid = Add_to_cart.objects.filter(user_id=uid)
+        l1 = []
+        subtotal = 0
+        Shipping_charge = 50
+        for i in aid:
+            l1.append(i.total_price)
+        print(l1)
+        subtotal = sum(l1)
+        print("subtotal:- ", subtotal)
+        total_price = subtotal + Shipping_charge
+        print("total price : ", total_price)
+        discount = 0
         if request.POST:
             coupon = request.POST['code']
-            
-        subtotal = 0
-        Shipping_charge = 200
-        total = 0
-        discount = 0
-        for i in cart_item:
-            subtotal += i.total_price
-            
-            total = subtotal + Shipping_charge  
+            print("code:- ", coupon)
+            caid = Coupon.objects.filter(code=coupon,one_time_use=True).exists()
+            print("coupon:-", caid)
+            if caid:
+                cid = Coupon.objects.get(code=coupon)
+                now_time = timezone.now()
+                cid.one_time_use=False    #use coupon only one time then after false
+                cid.save()
+                if cid.expiry_date > now_time:
+                    total_price -= cid.discount     
+                    discount = cid.discount
+                    request.session['discount'] = discount
+                    con = {
+                        "Shipping_charge": Shipping_charge, "subtotal": subtotal, "uid": uid,
+                        "aid": aid, "discount": discount, "total_price": total_price}
+                    messages.info(request, "Code applied successfully")
+                    return redirect("cart")
+                else:
+                    cid.delete()
+                    con = {
+                        "Shipping_charge": Shipping_charge, "subtotal": subtotal, "uid": uid, "aid": aid,
+                        "total_price": total_price, "discount": 0}
+                    messages.info(request, "Coupon has expired and has been deleted")
+                    return render(request, "cart.html", con)
+            else:
+                con = {
+                    "Shipping_charge": Shipping_charge, "subtotal": subtotal, "uid": uid, "aid": aid,
+                    "total_price": total_price, "discount": 0}
+                messages.info(request, "No discount on this code")
+                return redirect("cart")
+        else:
+            return render(request, "cart.html")
+    else:   
+        return render(request,"login.html")
+#===============
 
-
-        coupon = Coupon.objects.get(id = id)
         
        
 
         
         
-    return redirect("apply_coupne")     
+
+
 
     
 

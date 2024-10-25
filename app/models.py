@@ -90,3 +90,22 @@ class Coupon(models.Model):
     
     def __str__(self):
         return self.code
+    
+class Chackout(models.Model):
+    First_Name = models.CharField(max_length=40,blank=True,null=True)
+    Last_Name = models.CharField(max_length=40,blank=True,null=True)
+    Company_Name = models.CharField(max_length=40,blank=True,null=True)
+    Address  = models.CharField(max_length=40,blank=True,null=True)
+    City = models.CharField(max_length=40,blank=True,null=True)
+    Country = models.CharField(max_length=40,blank=True,null=True)
+    Postcode = models.CharField(max_length=12,blank=True,null=True)
+    Mobile = models.IntegerField(blank=True,null=True)
+    Email_Address = models.EmailField(unique=True,blank=True,null=True)
+    
+    def __str__(self):
+        return self.First_Name
+
+
+
+
+

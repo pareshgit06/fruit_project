@@ -29,7 +29,9 @@ urlpatterns = [
     path('Price_filter', views.Price_filter, name='Price_filter'),
     path('Search_filter', views.Search_filter, name='Search_filter'),
     path('Related_products', views.Related_products, name='Related_products'),
-    path('apply_coupon', views.apply_coupon, name='apply_coupon')
+    path('apply_coupon', views.apply_coupon, name='apply_coupon'),
+   
+
 
 
 

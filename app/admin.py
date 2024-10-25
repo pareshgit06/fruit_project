@@ -11,6 +11,10 @@ admin.site.register(Additional)
 admin.site.register(Add_to_cart)
 admin.site.register(Add_to_Wishlist)
 admin.site.register(Coupon)
+admin.site.register(Chackout)
+
+
+
 
 
 

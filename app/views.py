@@ -172,7 +172,6 @@ def cart(request):
     else:
         return render(request, "login.html")
 from django.shortcuts import redirect
-
 def add_to_cart(request, id):
     if "email" in request.session:
         uid = User.objects.get(email=request.session["email"])
@@ -262,16 +261,75 @@ def remove_Wishlist(request,id):
         wishlist_items.delete()
     return redirect("Wish_list")
 
-
 def chackout(request):
     if "email" in request.session:
-        uid = User.objects.get(email=request.session["email"]) 
+        uid = User.objects.get(email=request.session["email"])
+        cart_item = Add_to_cart.objects.filter(user_id=uid)
+        
+        if request.method == "POST":
+            First_Name = request.POST["First_Name"]
+            Last_Name = request.POST["Last_Name"]
+            Company_Name = request.POST["Company_Name"]
+            Address = request.POST["Address"]
+            City = request.POST["City"]
+            Country = request.POST["Country"]
+            Mobile = request.POST["Mobile"]
+            Email_Address = request.POST["Email_Address"]
 
-        con={"uid":uid}
-        return render(request,"chackout.html",con)
+            Chackout.objects.create(
+                First_Name=First_Name,
+                Last_Name=Last_Name,
+                Company_Name=Company_Name,
+                Address=Address,
+                City=City,
+                Country=Country,
+                Mobile=Mobile,
+                Email_Address=Email_Address
+            )
+            
+            cart_data = []
+            subtotal = 0
+            Shipping_charge = 200
+            total_price = 0
+            discount = 0
+            
+            for i in cart_item:
+                item_subtotal = i.quantity * i.price
+                cart_data.append({
+                    "item": i,
+                    "image": i.image, 
+                    "name": i.name,   
+                    "price": i.price,  
+                    "quantity": i.quantity,  
+                    "subtotal": item_subtotal
+                })
+            
+            # Calculate overall subtotal and total price
+            subtotal = sum(item['subtotal'] for item in cart_data)
+            total_price = subtotal + Shipping_charge - discount
+            
+            con = {
+                "uid": uid,
+                "cart_data": cart_data,
+                "subtotal": subtotal,
+                "Shipping_charge": Shipping_charge,
+                "total_price": total_price,
+                "discount": discount
+               
+            }
+
+            messages.success(request, "Your details have been submitted successfully.")
+            return render(request, "chackout.html", con)
+        else:
+            con = {
+                "cart_data":cart_item,
+                "user_name": uid.name,  
+                "user_email": uid.email
+              }
+            return render(request, "chackout.html", con)
+      
     else:
-        return render(request,'login.html')
-
+        return render(request, 'login.html')
 
 
 def contact(request):
@@ -310,7 +368,6 @@ def register(request):
             else:    
                 con={"msg":"Password do not match."}
                 return render(request,"register.html",con)
-                 
     else:
         return render(request, 'register.html')      
      
@@ -493,78 +550,7 @@ def Related_products(request):
      
      else:
          return render(request,"login.html")
-     
-# def apply_coupon(request):
-#     if "email" in request.session:
-#         uid = User.objects.get(email=request.session["email"])
-#         cart_item = Add_to_cart.objects.filter(user_id=uid)
-
-#         discount = 0
-#         if request.method == "POST":
-#             coupon_code = request.POST.get('code')  # user enter code(coupon code)
-#             try:
-#                 # agar database ka coupe code valide hai to (apply descout)
-#                 coupon = Coupon.objects.get(code=coupon_code)
-#                 discount = coupon.discount
-#                 messages.success(request,"Your coupon is apply successfuly...")
-#             except Coupon.DoesNotExist:
-#                 # agar database ka coupon code valide nahi hai tab discout is 0
-#                 discount = 0
-#                 messages.error(request,"Coupon is Not apply...")
-
-#         # Calculate subtotal and total
-#         subtotal = 0
-#         Shipping_charge = 200
-#         for i in cart_item:
-#             subtotal += i.total_price
-
-#         total = subtotal + Shipping_charge - discount
-#         con = {
-#             "discount": discount,
-#             "total": total,
-#             "subtotal": subtotal,
-#             "Shipping_charge": Shipping_charge,
-#             "cart_item": cart_item, }
-
-#         return render(request, "cart.html", con)
-#     else:
-#         return render(request, "login.html")
-
-
-# def apply_coupon(request):
-#     if "email" in request.session:
-#         uid = User.objects.get(email = request.session["email"])
-#         cart_item = Add_to_cart.objects.get(user_id = uid)
-
-#         discaunt = 0
-#         if request.method == "POST":
-#             coupon_code = request.POST.get("code")
-#             try:
-#                 coupon = Coupon.objects.get(code = coupon_code)
-#                 discaunt = coupon.discount
-#             except Coupon.DoesNotExist:
-#                 discaunt = 0
-
-#         subtotal = 0
-#         Shipping_charge = 200
-#         for i in cart_item:
-#             subtotal += i.total_price
-#         totle = subtotal + Shipping_charge - discaunt
-
-#         con = {
-#             "discaunt":discaunt,
-#             "subtotal":subtotal,
-#             "Shipping_charge":Shipping_charge,
-#             "totle":totle,
-#             "cart_item":cart_item }
-
-#         return render(request,"cart.html",con)
-#     else:
-#         return render(request,'login.html')    
-
-
-
-    
+       
 #===============
 from django.utils import timezone
 def apply_coupon(request):
@@ -620,6 +606,16 @@ def apply_coupon(request):
         return render(request,"login.html")
 #===============
 
+
+
+
+
+
+
+
+
+
+
         
        
 
@@ -632,60 +628,3 @@ def apply_coupon(request):
 
 
 
-
-
-# from django.db.models import Q
-# def shop(request):
-#     if "email" in request.session:
-#         uid = User.objects.get(email=request.session["email"])
-#         cid = Categories.objects.all()
-#         pid = Product.objects.all().order_by("-id")
-#         price_show = Price.objects.all()
-#         sorting = request.GET.get("sort")
-#         price = request.GET.get("price") 
-#         catagory = request.GET.get("catagory") # filter ke liye # yah catagory hai randam li liya gaya variable hai jo temlates mai ? hai vaha use hota hai
-#         if catagory:
-#             pid = Product.objects.filter(cat_id = catagory) # yaha cat_id  yah model mai jo filde hai vo filter hota hai
-#         elif price:
-#             pid = Product.objects.filter(price_id = price) 
-#         elif sorting=="lth":
-#             pid = Product.objects.order_by("price")
-#         elif sorting=="htl":
-#             pid = Product.objects.order_by("-price")
-#         elif sorting=="atz":
-#             pid = Product.objects.order_by("name")
-#         elif sorting=="zta":
-#             pid = Product.objects.order_by("-name")
-#         else:
-#             pid = Product.objects.all().order_by("-id")
-        
-#         Additional_all= Additional.objects.all()
-#         Additional_fil = request.GET.getlist('Additional_filter')
-#         if Additional_fil:
-#             pid = Product.objects.filter(Additional_filter__in=Additional_fil)
-#         else:
-#             pid = Product.objects.all() 
-
-#         paginator = Paginator(pid,3)
-#         page_number = request.GET.get("page",1)
-#         try:
-#           page_number = int(page_number)
-#         except ValueError:
-#           page_number = 1 
-
-#         pid = paginator.get_page(page_number)
-#         show_page = paginator.get_elided_page_range(page_number, on_each_side=1, on_ends=1)    
-
-#         con = {
-#                 "uid":uid,
-#                 "cid":cid,
-#                 "pid":pid,
-#                 "price_show":price_show,
-#                 "sorting":sorting,
-#                 "show_page":show_page,
-#                 "Additional_all":Additional_all,
-#                 "Additional_fil":Additional_fil}
-        
-#         return render(request,"shop.html",con)
-#     else:
-#         return render(request,"login.html")
